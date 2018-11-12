@@ -3,7 +3,7 @@ module GlobalFileHelper
 using Reexport
 @reexport using ReadGlobal
 
-using InplaceRealFFT, FluidFields
+using InplaceRealFFT, FluidFields, FluidTensors
 
 function InplaceRealFFT.PaddedArray{T}(filename::AbstractString) where {T}
     nx,ny,nz,lx,ly,lz = getdimsize()
@@ -47,5 +47,10 @@ function FluidFields.VectorField{T}(filenames::Vararg{AbstractString,3}) where {
     read!(filenames[3],f.c.z.field,paddeds[3])
     return f 
 end
+
+FluidTensors.SymTrTenArray(filenames::Vararg{AbstractString,5}) = SymTrTenArray(readfield.(filenames)...)
+FluidTensors.SymTenArray(filenames::Vararg{AbstractString,6}) = SymTenArray(readfield.(filenames)...)
+FluidTensors.AntiSymTenArray(filenames::Vararg{AbstractString,3}) = AntiSymTenArray(readfield.(filenames)...)
+FluidTensors.VecArray(filenames::Vararg{AbstractString,3}) = VecArray(readfield.(filenames)...)
 
 end
