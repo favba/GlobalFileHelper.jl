@@ -35,6 +35,26 @@ function FluidFields.ScalarField(filename::AbstractString)
     return f 
 end
 
+function Base.read!(filename::AbstractString,f::ScalarField{T}) where {T}
+    nx,ny,nz,lx,ly,lz = getdimsize()
+    dtype,padded = checkinput(filename,nx,ny,nz)
+    @assert dtype === T
+    read!(filename,f.field,padded)
+    return f 
+end
+
+function Base.read!(filenames::NTuple{3,AbstractString},f::VectorField{T}) where {T}
+    nx,ny,nz,lx,ly,lz = getdimsize()
+    dtp = checkinput.(filenames,nx,ny,nz)
+    dtypes = getindex.(dtp,1)
+    paddeds = getindex.(dtp,2)
+    @assert all(T .=== dtypes)
+    read!(filenames[1],f.c.x.field,paddeds[1])
+    read!(filenames[2],f.c.y.field,paddeds[2])
+    read!(filenames[3],f.c.z.field,paddeds[3])
+    return f 
+end
+
 function FluidFields.VectorField{T}(filenames::Vararg{AbstractString,3}) where {T}
     nx,ny,nz,lx,ly,lz = getdimsize()
     dtp = checkinput.(filenames,nx,ny,nz)
