@@ -87,4 +87,27 @@ FluidTensors.SymTenArray(filenames::Vararg{AbstractString,6}) = SymTenArray(read
 FluidTensors.AntiSymTenArray(filenames::Vararg{AbstractString,3}) = AntiSymTenArray(readfield.(filenames)...)
 FluidTensors.VecArray(filenames::Vararg{AbstractString,3}) = VecArray(readfield.(filenames)...)
 
+function FluidFields.SymTenField(filenames::Vararg{AbstractString,6})
+    nx,ny,nz,lx,ly,lz = getdimsize()
+    dtp = checkinput.(filenames,nx,ny,nz)
+    dtypes = getindex.(dtp,1)
+    paddeds = getindex.(dtp,2)
+    @assert all(dtypes[1] .=== dtypes)
+    f = SymTenField{dtypes[1]}((nx,ny,nz),(lx,ly,lz))
+    read!.(filenames,getfield.(getfield.(Ref(f.c), (:xx, :xy, :xz, :yy, :yz, :zz)),:field),paddeds)
+    return f 
+end
+
+function FluidFields.SymTrTenField(filenames::Vararg{AbstractString,5})
+    nx,ny,nz,lx,ly,lz = getdimsize()
+    dtp = checkinput.(filenames,nx,ny,nz)
+    dtypes = getindex.(dtp,1)
+    paddeds = getindex.(dtp,2)
+    @assert all(dtypes[1] .=== dtypes)
+    f = SymTrTenField{dtypes[1]}((nx,ny,nz),(lx,ly,lz))
+    read!.(filenames,getfield.(getfield.(Ref(f.c), (:xx, :xy, :xz, :yy, :yz)),:field),paddeds)
+    return f 
+end
+
+
 end
