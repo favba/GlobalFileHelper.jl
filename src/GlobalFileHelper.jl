@@ -109,5 +109,15 @@ function FluidFields.SymTrTenField(filenames::Vararg{AbstractString,5})
     return f 
 end
 
+function FluidFields.AntiSymTenField(filenames::Vararg{AbstractString,3})
+    nx,ny,nz,lx,ly,lz = getdimsize()
+    dtp = checkinput.(filenames,nx,ny,nz)
+    dtypes = getindex.(dtp,1)
+    paddeds = getindex.(dtp,2)
+    @assert all(dtypes[1] .=== dtypes)
+    f = AntiSymTenField{dtypes[1]}((nx,ny,nz),(lx,ly,lz))
+    read!.(filenames,getfield.(getfield.(Ref(f.c), (:xy, :xz, :yz)),:field),paddeds)
+    return f 
+end
 
 end
